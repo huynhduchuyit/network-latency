@@ -2,16 +2,46 @@
 
 ## Overview
 
-This project provisions **two EC2 instances** in AWS and deploys an application on one of
-them that measures and exposes the **network latency** to the second server.
+This project provisions two EC2 instances in AWS and deploys an application on one of them that measures and exposes the network latency to the second server.
 
-Infrastructure is defined as **Infrastructure as Code** using **Terraform**, and the application is pre-installed into a **custom AMI** using **Packer** for faster and repeatable deployments.
+The infrastructure is defined as code using Terraform. The application is automatically installed and configured on EC2 instances by using a custom AMI built with Packer, combined with shell script user data.
 
 ## 📂 Repository Structure
+```
+app (Application source code)
+├── docker-compose.yml: Docker Compose config
+├── Dockerfile: Docker image build
+├── main.py: Python application code
+├── requirements.txt: Python dependencies
+└── results.txt: Output application
 
-- **app/** - Application source code
-- **packer/** - Packer to build custom AMIs
-- **terraform/** - Terraform to provision AWS infrastructure
+packer (Packer to build custom AMIs)
+├── scripts
+│   └── install-docker.sh: Bash script to install Docker
+├── templates
+│   └── .envrc: environment variables config (for direnv)
+│   └── plugins.pkr.hcl: Packer config for plugins
+│   └── ubuntu-24-04-lts.pkr.hcl: Packer config to build Ubuntu 24.04 LTS image
+│   └── variables.pkr.hcl: Packer variables definitions
+
+terraform (Terraform to provision AWS infrastructure)
+├── modules
+│   ├── ec2
+│   │   └── main.tf: EC2 module Terraform config
+│   │   └── outputs.tf: EC2 module outputs definitions
+│   │   └── variables.tf: EC2 module input variables
+│   ├── ssh
+│   │   └── main.tf: SSH module Terraform config
+│   │   └── outputs.tf: SSH module outputs definitions
+│   │   └── variables.tf: SSH module input variables
+├── .envrc: environment variables config (for direnv)
+├── ec2.tf: Terraform config for EC2 resources
+├── providers.tf: Terraform providers setup (e.g., AWS)
+├── security-group.tf: Terraform config for security groups
+├── setup.sh: Bash script for EC2 user_data
+├── terraform.tf: Terraform configuration file
+└── variables.tf: global Terraform input variables
+```
 
 ## 🚀 How to Provision and Deploy Application
 
@@ -51,7 +81,7 @@ Terraform will create:
 - Server 2 (Ping target)
 - Security groups for ICMP & HTTP access
 
-## 📊 How to Interpret Metrics
+## 📊 How to access the latency metrics
 
 Call the endpoint to get the network latency on the first server:
 ```
