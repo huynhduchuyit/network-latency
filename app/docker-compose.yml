@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  network-latency:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      TARGET_HOST: "172.31.16.20"
+    volumes:
+      - ./results.txt:/app/results.txt
